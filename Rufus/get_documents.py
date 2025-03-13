@@ -18,8 +18,11 @@ groq_api_key = os.getenv("GROQ_API_KEY")
 langsmith_api_key = os.getenv("LANGSMITH_API_KEY")
 jina_api_key = os.getenv("JINA_API_KEY")
 openai_api_key = os.getenv("OPENAI_API_KEY")
-llm_llama = ChatGroq(model="llama-3.3-70b-versatile")
-
+try:
+  llm_llama = ChatGroq(model="llama-3.3-70b-versatile")
+except groq.AuthenticationError as e:
+  print("The server could not be reached, check api_key")
+  
 class State(TypedDict):
     input: str
     goal: str
@@ -66,7 +69,10 @@ def get_goal(state: State) -> State:
      """)
   ])
   final_prompt = prompt.invoke({"text": state["input"]})
-  response = llm_llama.invoke(final_prompt)
+  try:
+    response = llm_llama.invoke(final_prompt)
+  except groq.RateLimitError as e:
+    print("A 429 status code was received, wait for a bit.")
   state["goal"] = response.content
   state["links"].update(get_links(state["input"]))
   return state
@@ -133,7 +139,10 @@ def update_relevant_links(state: State) -> State:
     """)
   ])
   final_prompt = prompt.invoke({"goal": state["goal"], "links": links, "link":state["next_url"]})
-  response = llm_llama.invoke(final_prompt)
+  try:
+    response = llm_llama.invoke(final_prompt)
+  except groq.RateLimitError as e:
+    print("A 429 status code was received, wait for a bit.")
   f_links = get_links(response.content)
   state["links"].update(f_links)
   return state
