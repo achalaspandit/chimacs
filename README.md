@@ -4,11 +4,13 @@
 Rufus is a Agentic AI workflow developed with LangGraph that implements a web crawler that takes user instructions, identifies a goal, and then systematically scrapes relevant content from a website. It uses a combination of LLMs, web scraping, and vector similarity to extract and filter pertinent information.
 
 ### Steps to run
+1. Clone Github repository in local machine.
 ```
 git clone https://github.com/achalaspandit/chimacs.git
 
 ```
-create .env file and add the following API keys
+2. Ensure dependencies mentioned in requirements.txt are installed
+3. create .env file and add the following API keys
 ```
 GROQ_API_KEY="your_groq_api_key"
 LANGSMITH_TRACING=true
@@ -18,7 +20,29 @@ LANGSMITH_PROJECT="your_langsmith_name"
 JINA_API_KEY = "your_jina_api_key"
 OPENAI_API_KEY = "your_openai_key"
 ```
+4. To build Rufus library, run the following commands within the project directory.
+```
+python setup.py sdist bdist_wheel
+pip install -e ./
+```
 
+This will create build, test and Rufus.egg-info folders within the repo and you will also get a sucessfully installed message.
+
+5. Open Python command line and execute below statements.
+```
+from dotenv import load_dotenv
+load_dotenc(override=True)
+
+from Rufus.get_documents import get_documents
+
+input_string = """python
+  instructions = "We're making a chatbot for the HR in Riverside."
+  documents = client.scrape("https://riversideca.gov/")"""
+
+doc = get_documents(input_string)
+
+print(doc)
+```
 
 ### Workflow Details
 
